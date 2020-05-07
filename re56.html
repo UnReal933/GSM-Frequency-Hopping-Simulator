@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="fr">
+	<head>
+		<meta charset="utf-8">';
+		<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+		<link rel="stylesheet" href="assets/css/bootstrap.css">
+	</head>
+	
+	<style>
+		.grid-container{
+			display : grid;
+			grid-template-columns : 25px 25px 25px 25px 25px 25px 25px 25px;
+			grid-gap : 10px 0px;
+			
+		}
+		.grid-container > div{
+			border : 1px solid black;
+			text-align : center;
+			font-size : 15px;
+			height:20px;
+		}
+	</style>
+	
+	<body onload="GridSystem()">
+		<div class="row mx-auto" id="master-row">
+		</div>
+		<div class="text-center">
+			<div class="form-group mt-5">
+				<label for="communication-input">Number of communications : </label>
+				<input id="communication-input" type="number" min="1" max="40" value="1"></input>
+			</div>
+			<button id="submit-btn" class="btn btn-primary mt-2" onclick="Simulation()">Simuler</button>
+		</div>
+	</body>
+	<script>
+		//Set up the view
+		function GridSystem(){
+		for(var j=1; j<=5;j++){
+			//create 5 columns
+			var col = document.createElement("div");
+			col.className = "col";
+			col.id = "col-" + j;
+			document.getElementById("master-row").appendChild(col);
+			
+			//Add title to every column
+			var title = document.createElement("h5");
+			title.innerHTML = "T = " + (j-1)
+			document.getElementById("col-"+j).appendChild(title);
+			
+			//Add grid system in every column
+			var grid = document.createElement("div");
+			grid.className = "grid-container mt-2";
+			grid.id = "grid-" + j;
+			document.getElementById("col-"+j).appendChild(grid);
+			
+			//Draw the grid
+			for(var i=(1+(40*(j-1)));i<=(40+(40*(j-1)));i++){
+				var div = document.createElement("div");
+				div.id = i;
+				document.getElementById("grid-"+j).appendChild(div);
+			}
+		}
+		}
+		
+		//Verify input value
+		/*document.getElementById("submit-btn").addEventListener("click",Simulation());*/
+		
+		function Simulation(){
+			//reset the grid
+			for(var u=1; u<=40*5; u++){
+				document.getElementById(u).innerHTML = "";
+				document.getElementById(u).style.color = "black";
+			}
+			
+			//get the number of communications
+			var inputCom = document.getElementById("communication-input");
+			if( inputCom.value > 40){ inputCom.value = 40;}
+			
+			//Initialization
+			var listPosition = [];
+			var pattern = [];
+			pattern.push(1);
+			
+			//define hopping pattern
+			for(var f=1; f<5; f++){
+				do{
+					var num = Math.floor(Math.random() * 5) + 1;
+				}while(pattern.indexOf(num)!=-1);
+				pattern.push(num);
+				console.log(num);
+			}
+			
+			//for each communication simulate hopping pattern
+			for(var k=1; k<=inputCom.value ; k++){
+				//Generate a random number between 1 and 40
+				do{
+					var position = Math.floor(Math.random() * 40) + 1;
+				}while (listPosition.indexOf(position)!=-1);
+				
+				//Store the position of the communication in the array to not have the same
+				//position 2 times
+				listPosition.push(position);
+				
+				//Display the communication number in the div with a random color
+				var divPos = document.getElementById(position);
+				divPos.innerHTML = k;
+				var randColor = '#'+Math.floor(Math.random()*16777215).toString(16);
+				divPos.style.color = randColor;
+				
+				//Apply the design pattern for the current communication
+				for(l=1;l<5;l++){
+					var idToChange = (pattern[l]-1)*8 + position + l*40
+					if (idToChange>(l+1)*40){idToChange-=40;}
+					document.getElementById(idToChange).innerHTML = k;
+					document.getElementById(idToChange).style.color = randColor;
+				}
+			}
+		}
+	</script>
+</html>
