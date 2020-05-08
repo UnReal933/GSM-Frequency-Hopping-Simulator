@@ -1,9 +1,10 @@
 <!DOCTYPE html>
 <html lang="fr">
 	<head>
-		<meta charset="utf-8">';
+		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-		<link rel="stylesheet" href="assets/css/bootstrap.css">
+		<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+		<title>Frequency Hopping Simulation</title>
 	</head>
 	
 	<style>
@@ -22,52 +23,75 @@
 	</style>
 	
 	<body onload="GridSystem()">
+		<h4 class="text-center my-4">Frequency Hopping Simulator</h4>
 		<div class="row mx-auto" id="master-row">
 		</div>
 		<div class="text-center">
 			<div class="form-group mt-5">
+				<label for="TDMA-input">Number of TDMA : </label>
+				<input id="TDMA-input" type="number" min="2" max="20" value="5"></input>
+			</div>
+			<div class="form-group mt-1">
 				<label for="communication-input">Number of communications : </label>
 				<input id="communication-input" type="number" min="1" max="40" value="1"></input>
 			</div>
-			<button id="submit-btn" class="btn btn-primary mt-2" onclick="Simulation()">Simuler</button>
+			<button id="submit-btn" class="btn btn-primary mt-2" onclick="Simulation()">Simulate</button>
 		</div>
 	</body>
 	<script>
+		
+		function GetTDMA(){
+			//Get the number of TDMA frame
+			var TDMA = document.getElementById("TDMA-input").value;
+			
+			//Control the input
+			if(TDMA <2){TDMA=2;}
+			if(TDMA >40){TDMA=40;}
+			
+			return TDMA;
+		}
+		
 		//Set up the view
 		function GridSystem(){
-		for(var j=1; j<=5;j++){
-			//create 5 columns
-			var col = document.createElement("div");
-			col.className = "col";
-			col.id = "col-" + j;
-			document.getElementById("master-row").appendChild(col);
 			
-			//Add title to every column
-			var title = document.createElement("h5");
-			title.innerHTML = "T = " + (j-1)
-			document.getElementById("col-"+j).appendChild(title);
+			var TDMA = GetTDMA();
 			
-			//Add grid system in every column
-			var grid = document.createElement("div");
-			grid.className = "grid-container mt-2";
-			grid.id = "grid-" + j;
-			document.getElementById("col-"+j).appendChild(grid);
-			
-			//Draw the grid
-			for(var i=(1+(40*(j-1)));i<=(40+(40*(j-1)));i++){
-				var div = document.createElement("div");
-				div.id = i;
-				document.getElementById("grid-"+j).appendChild(div);
+			document.getElementById("master-row").innerHTML = "";
+			for(var j=1; j<=TDMA;j++){
+				//create X columns
+				var col = document.createElement("div");
+				col.className = "col-6 col-md-4 col-lg-3 col-xl-2 mt-2";
+				col.id = "col-" + j;
+				document.getElementById("master-row").appendChild(col);
+				
+				//Add title to every column
+				var title = document.createElement("h5");
+				title.innerHTML = "T = " + (j-1)
+				document.getElementById("col-"+j).appendChild(title);
+				
+				//Add grid system in every column
+				var grid = document.createElement("div");
+				grid.className = "grid-container mt-2";
+				grid.id = "grid-" + j;
+				document.getElementById("col-"+j).appendChild(grid);
+				
+				//Draw the grid
+				for(var i=(1+(40*(j-1)));i<=(40+(40*(j-1)));i++){
+					var div = document.createElement("div");
+					div.id = i;
+					document.getElementById("grid-"+j).appendChild(div);
+				}
 			}
 		}
-		}
 		
-		//Verify input value
-		/*document.getElementById("submit-btn").addEventListener("click",Simulation());*/
 		
 		function Simulation(){
+		
+			var TDMA = GetTDMA();
+			GridSystem();
+		
 			//reset the grid
-			for(var u=1; u<=40*5; u++){
+			for(var u=1; u<=40*TDMA; u++){
 				document.getElementById(u).innerHTML = "";
 				document.getElementById(u).style.color = "black";
 			}
@@ -79,15 +103,15 @@
 			//Initialization
 			var listPosition = [];
 			var pattern = [];
+			var nbFrame= [];
 			pattern.push(1);
 			
 			//define hopping pattern
-			for(var f=1; f<5; f++){
+			for(var f=1; f<TDMA; f++){
 				do{
-					var num = Math.floor(Math.random() * 5) + 1;
+					var num = Math.floor(Math.random() * TDMA) + 1;
 				}while(pattern.indexOf(num)!=-1);
 				pattern.push(num);
-				console.log(num);
 			}
 			
 			//for each communication simulate hopping pattern
@@ -108,9 +132,9 @@
 				divPos.style.color = randColor;
 				
 				//Apply the design pattern for the current communication
-				for(l=1;l<5;l++){
-					var idToChange = (pattern[l]-1)*8 + position + l*40
-					if (idToChange>(l+1)*40){idToChange-=40;}
+				for(l=1;l<TDMA;l++){
+					var idToChange = (pattern[l]-1)*8 + position + l*40;
+					while(idToChange>(l+1)*40){idToChange-=40;}
 					document.getElementById(idToChange).innerHTML = k;
 					document.getElementById(idToChange).style.color = randColor;
 				}
