@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="fr">
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+		<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+		<title>Frequency Hopping Simulation</title>
+	</head>
+	
+	<style>
+		.grid-container{
+			display : grid;
+			grid-template-columns : 25px 25px 25px 25px 25px 25px 25px 25px;
+			grid-gap : 10px 0px;
+			
+		}
+		.grid-container > div{
+			border : 1px solid black;
+			text-align : center;
+			font-size : 15px;
+			height:20px;
+		}
+	</style>
+	
+	<body onload="GridSystem()">
+		<h4 class="text-center my-4">Frequency Hopping Simulator</h4>
+		<div class="row mx-auto" id="master-row">
+		</div>
+		<div class="text-center">
+			<div class="form-group mt-5">
+				<label for="TDMA-input">Number of TDMA : </label>
+				<input id="TDMA-input" type="number" min="2" max="20" value="5"></input>
+			</div>
+			<div class="form-group mt-1">
+				<label for="communication-input">Number of communications : </label>
+				<input id="communication-input" type="number" min="1" max="40" value="1"></input>
+			</div>
+			<button id="submit-btn" class="btn btn-primary mt-2" onclick="Simulation()">Simulate</button>
+		</div>
+	</body>
+	<script>
+
+		var maio = { trx1: 2, trx2:4, trx3: 3, trx4: 5, trx5: 1}
+		var frequency = {f0: '#FF2D00', f1: '#FFFF00', f2: '#68FF00', f3: '#00C5FF', f4: '#F300FF'};
+
+
+		function getFrequency(t, maioID){
+			var maioVal = maio[maioID];
+			
+			var freqNum = (t+maioVal)%5;
+			
+			var freq = 'f'+freqNum;
+			return frequency[freq];
+		}
+		
+		function GetTDMA(){
+			//Get the number of TDMA frame
+			var TDMA = document.getElementById("TDMA-input").value;
+			
+			//Control the input
+			if(TDMA <2){TDMA=2;}
+			if(TDMA >40){TDMA=40;}
+			
+			return TDMA;
+		}
+		
+		//Set up the view
+		function GridSystem(){
+			
+			var TDMA = GetTDMA();
+			
+			document.getElementById("master-row").innerHTML = "";
+			for(var j=1; j<=TDMA;j++){
+				//create X columns
+				var col = document.createElement("div");
+				col.className = "col-6 col-md-4 col-lg-3 col-xl-2 mt-2";
+				col.id = "col-" + j;
+				document.getElementById("master-row").appendChild(col);
+				
+				//Add title to every column
+				var title = document.createElement("h5");
+				title.innerHTML = "T = " + (j-1)
+				document.getElementById("col-"+j).appendChild(title);
+				
+				//Add grid system in every column
+				var grid = document.createElement("div");
+				grid.className = "grid-container mt-2";
+				grid.id = "grid-" + j;
+				document.getElementById("col-"+j).appendChild(grid);
+				
+				//Draw the grid
+				for(var i=(1+(40*(j-1)));i<=(40+(40*(j-1)));i++){
+					var div = document.createElement("div");
+					div.id = i;
+					document.getElementById("grid-"+j).appendChild(div);
+				}
+			}
+		}
+		
+		
+		function Simulation(){
+			var x=0;
+			var TDMA = GetTDMA();
+			GridSystem();
+		
+			//reset the grid
+			for(var u=1; u<=40*TDMA; u++){
+				document.getElementById(u).innerHTML = "";
+				document.getElementById(u).style.color = "black";
+			}
+			
+			//get the number of communications
+			var inputCom = document.getElementById("communication-input");
+			if( inputCom.value > 40){ inputCom.value = 40;}
+			
+			//Initialization
+			var listPosition = [];
+			var pattern = [];
+			var nbFrame= [];
+			pattern.push(1);
+			
+			//define hopping pattern
+			for(var f=1; f<TDMA; f++){
+				do{
+					
+					var num = Math.floor(Math.random() * TDMA) + 1;
+				}while(pattern.indexOf(num)!=-1);
+				pattern.push(num);
+			}
+
+			var test=1;
+			var min,max;
+			//for each communication simulate hopping pattern
+			for(var k=1; k<=inputCom.value ; k++){
+				//Generate a random number between 1 and 40
+				if(x==0) min = 8*(test-1)+2;
+				else min = 8*(test-1)+1;
+				max=8*(test);
+
+				
+				do{
+						var position=Math.floor(Math.random() * (max - min + 1)) + min;
+				}while (listPosition.indexOf(position)!=-1);
+				
+				
+				if(test==5){
+					test=0;
+				}
+				test++;
+
+				var trxID = x+1;
+				// x++;
+				var maioID = 'trx'+trxID;
+				// trx+trxID+"bool"=1;
+				var color=getFrequency(0, maioID);
+				listPosition.push(position);
+
+				//Display the communication number in the div with a random color
+				var divPos = document.getElementById(position);
+				// divPos.style.borderColor=color;
+				changeRowColor(position,color);
+				console.log(color);
+
+				divPos.innerHTML = k;
+				var randColor = '#'+Math.floor(Math.random()*16777215).toString(16);
+				divPos.style.color = "black";
+				
+				//Apply the design pattern for the current communication
+				for(l=1;l<TDMA;l++){
+					var idToChange = position + l*40;
+					while(idToChange>(l+1)*40){idToChange-=40;}
+					color=getFrequency(l, maioID);
+					document.getElementById(idToChange).innerHTML = k;
+					document.getElementById(idToChange).style.color = "black";
+					changeRowColor(idToChange,color);
+					
+				}
+				x++;
+				if(x==5){
+					x=0;
+				}
+
+			}
+
+			for(i=1;i<320;i=i+40){
+				document.getElementById(i).style.backgroundColor = "#805a46";
+				
+			}
+		}
+
+		function changeRowColor(position,color){
+			var test=position/40;
+			// console.log(Math.ceil(test));
+		
+			var whichRow=Math.ceil(position/8);
+			console.log(Math.ceil(whichRow));
+
+			// if(position>=1*whichRow && position<=8*whichRow){
+				for(var x=1+(8*(whichRow-1));x<=8*whichRow;x++){
+					// console.log(x);
+				
+					var divPosTest = document.getElementById(x);
+					divPosTest.style.backgroundColor=color;	
+				}
+
+		}
+	</script>
+</html>
