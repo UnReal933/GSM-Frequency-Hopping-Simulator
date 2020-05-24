@@ -96,6 +96,12 @@
 				}
 			}
 		}
+
+		// to check which rows are filled
+		var markers = [];
+		for (var i = 1; i <= 5; i++) {
+    			markers[i] = 0;
+		}
 		
 		
 		function Simulation(){
@@ -128,6 +134,8 @@
 				pattern.push(num);
 			}
 
+		
+
 			var test=1;
 			var min,max;
 			//for each communication simulate hopping pattern
@@ -142,7 +150,8 @@
 						var position=Math.floor(Math.random() * (max - min + 1)) + min;
 				}while (listPosition.indexOf(position)!=-1);
 				
-				
+				var row_taken=Math.ceil(position/8);
+				markers[row_taken]=1;
 				if(test==5){
 					test=0;
 				}
@@ -182,10 +191,11 @@
 
 			}
 
-			for(i=1;i<320;i=i+40){
+			for(i=1;i<200;i=i+40){
 				document.getElementById(i).style.backgroundColor = "#805a46";
 				
 			}
+			fillRemainingColor(markers);
 		}
 
 		function changeRowColor(position,color){
@@ -202,6 +212,30 @@
 					var divPosTest = document.getElementById(x);
 					divPosTest.style.backgroundColor=color;	
 				}
+
+		}
+
+		function fillRemainingColor(markers){
+			console.log("HEloooooo");
+			var TDMA = GetTDMA();
+			for(i=1;i<markers.length;i++){
+				if(markers[i]==0){
+					var maioID = 'trx'+i;
+					var color=getFrequency(0, maioID);
+					var idToChange=8*i;
+					changeRowColor(idToChange,color);
+
+					for(l=1;l<TDMA;l++){
+					idToChange = idToChange + l*40;
+					while(idToChange>(l+1)*40){idToChange-=40;}
+					color=getFrequency(l, maioID);
+					document.getElementById(idToChange).style.color = "black";
+					changeRowColor(idToChange,color);
+					
+				}
+
+				}
+			}
 
 		}
 	</script>
