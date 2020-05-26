@@ -1,242 +1,280 @@
 <!DOCTYPE html>
 <html lang="fr">
-	<head>
-		<meta charset="utf-8">
-		<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-		<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
-		<title>Frequency Hopping Simulation</title>
-	</head>
-	
-	<style>
-		.grid-container{
-			display : grid;
-			grid-template-columns : 25px 25px 25px 25px 25px 25px 25px 25px;
-			grid-gap : 10px 0px;
-			
-		}
-		.grid-container > div{
-			border : 1px solid black;
-			text-align : center;
-			font-size : 15px;
-			height:20px;
-		}
-	</style>
-	
-	<body onload="GridSystem()">
-		<h4 class="text-center my-4">Frequency Hopping Simulator</h4>
-		<div class="row mx-auto" id="master-row">
-		</div>
-		<div class="text-center">
-			<div class="form-group mt-5">
-				<label for="TDMA-input">Number of TDMA : </label>
-				<input id="TDMA-input" type="number" min="2" max="20" value="5"></input>
-			</div>
-			<div class="form-group mt-1">
-				<label for="communication-input">Number of communications : </label>
-				<input id="communication-input" type="number" min="1" max="40" value="1"></input>
-			</div>
-			<button id="submit-btn" class="btn btn-primary mt-2" onclick="Simulation()">Simulate</button>
-		</div>
-	</body>
-	<script>
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+	<title>Frequency Hopping Simulation</title>
+</head>
 
-		var maio = { trx1: 2, trx2:4, trx3: 3, trx4: 5, trx5: 1}
-		var frequency = {f0: '#FF2D00', f1: '#FFFF00', f2: '#68FF00', f3: '#00C5FF', f4: '#F300FF'};
+<style>
+	.grid-container{
+		display : grid;
+		grid-template-columns : 25px 25px 25px 25px 25px 25px 25px 25px;
+		grid-gap : 10px 0px;
+
+	}
+	.grid-container > div{
+		border : 1px solid black;
+		text-align : center;
+		font-size : 15px;
+		height:20px;
+	}
+</style>
+
+<body onload="GridSystem()">
+<h4 class="text-center my-4">Frequency Hopping Simulator</h4>
+<div class="row mx-auto" id="master-row">
+</div>
+<div class="text-center">
+	<div class="form-group mt-5">
+		<label for="Type-input">Type of communications : </label>
+		<select id="Type-input">
+			<option value="0" selected="selected">GSM</option>
+			<option value="1">GRPS/Edge</option>
+		</select>
+	</div>
+	<div class="form-group mt-1">
+		<label for="TDMA-input">Number of TDMA : </label>
+		<input id="TDMA-input" type="number" min="2" max="20" value="5">
+	</div>
+	<div class="form-group mt-1">
+		<label for="communication-input">Number of communications : </label>
+		<input id="communication-input" type="number" min="1" max="40" value="1">
+	</div>
+	<button id="submit-btn" class="btn btn-primary mt-2" onclick="Simulation()">Simulate</button>
+</div>
+</body>
+<script>
+
+	//variable
+	var matrix = [] //Tdma Frame
+	var matrixOfMatrix = []; //List of TDMA Frame
+	var caseArray = [];
+	var caseNumber = [];
+	var numberOfOccurence = [];
+	var commLength = [];
+	var colorPattern = ['Green', 'Magenta', 'Cyan', 'Red', 'Yellow'];
+	var newColorPattern = [];
+	const MAIO = [0, 3,4, 2,1]
 
 
-		function getFrequency(t, maioID){
-			var maioVal = maio[maioID];
-			
-			var freqNum = (t+maioVal)%5;
-			
-			var freq = 'f'+freqNum;
-			return frequency[freq];
+
+	//Get the number of TDMA frame
+	function GetTDMA(){
+		return document.getElementById("TDMA-input").value;
+	}
+
+	//Set up the view
+	function GridSystem(){
+		var TDMA = GetTDMA();
+		document.getElementById("master-row").innerHTML = "";
+		for(var j=1; j<=TDMA;j++){
+			//create X columns
+			var col = document.createElement("div");
+			col.className = "col-6 col-md-4 col-lg-3 col-xl-2 mt-2";
+			col.id = "col-" + j;
+			document.getElementById("master-row").appendChild(col);
+
+			//Add title to every column
+			var title = document.createElement("h5");
+			title.innerHTML = "T = " + (j-1)
+			document.getElementById("col-"+j).appendChild(title);
+
+			//Add grid system in every column
+			var grid = document.createElement("div");
+			grid.className = "grid-container mt-2";
+			grid.id = "grid-" + j;
+			document.getElementById("col-"+j).appendChild(grid);
+
+			//Draw the grid
+			for(var i=(1+(40*(j-1)));i<=(40+(40*(j-1)));i++){
+				var div = document.createElement("div");
+				div.id = i;
+				document.getElementById("grid-"+j).appendChild(div);
+			}
 		}
-		
-		function GetTDMA(){
-			//Get the number of TDMA frame
-			var TDMA = document.getElementById("TDMA-input").value;
-			
-			//Control the input
-			if(TDMA <2){TDMA=2;}
-			if(TDMA >40){TDMA=40;}
-			
-			return TDMA;
-		}
-		
-		//Set up the view
-		function GridSystem(){
-			
-			var TDMA = GetTDMA();
-			
-			document.getElementById("master-row").innerHTML = "";
-			for(var j=1; j<=TDMA;j++){
-				//create X columns
-				var col = document.createElement("div");
-				col.className = "col-6 col-md-4 col-lg-3 col-xl-2 mt-2";
-				col.id = "col-" + j;
-				document.getElementById("master-row").appendChild(col);
-				
-				//Add title to every column
-				var title = document.createElement("h5");
-				title.innerHTML = "T = " + (j-1)
-				document.getElementById("col-"+j).appendChild(title);
-				
-				//Add grid system in every column
-				var grid = document.createElement("div");
-				grid.className = "grid-container mt-2";
-				grid.id = "grid-" + j;
-				document.getElementById("col-"+j).appendChild(grid);
-				
-				//Draw the grid
-				for(var i=(1+(40*(j-1)));i<=(40+(40*(j-1)));i++){
-					var div = document.createElement("div");
-					div.id = i;
-					document.getElementById("grid-"+j).appendChild(div);
+	}
+
+	// Run the simulation
+	function Simulation(){
+		matrix = [] //Tdma Frame
+		matrixOfMatrix = []; //List of TDMA Frame
+		caseArray = []; //List of empty cases
+		caseNumber = []; // List of comm.
+		numberOfOccurence = [];
+		commLength = [];
+
+		GridSystem();
+		init();
+
+
+		for(var i=1; i<=GetTDMA() * 40;i++){
+			// Initialization of the view
+			if((i-1)%40 == 0){
+				// Set BCCH as value for first cases
+				document.getElementById(i).innerHTML = "B";
+				}else{
+				// Set the comm. value
+				if(matrixOfMatrix[Math.floor((i-1)/40)][(i-1)%40] != -1)
+					document.getElementById(i).innerHTML = matrixOfMatrix[Math.floor((i-1)/40)][(i-1)%40];
+			}
+			// Colorize cases based on it place
+			var divPosTest = document.getElementById(i);
+			divPosTest.style.backgroundColor=colorPattern[Math.ceil(i%40/8)-1];
+			if(i%40/8 == 0) {divPosTest.style.backgroundColor=colorPattern[4];}
+			// Cycle through the color scheme
+			if(i > 1 && (i-1)%40 == 0) {
+				for (var maioId = 0; maioId < 5; maioId++) {
+					newColorPattern[maioId] = colorPattern[MAIO[maioId]];
+				}
+				for (var indice = 0; indice < 5; indice++) {
+					colorPattern[indice] = newColorPattern[indice];
 				}
 			}
 		}
 
-		// to check which rows are filled
-		var markers = [];
-		for (var i = 1; i <= 5; i++) {
-    			markers[i] = 0;
-		}
-		
-		
-		function Simulation(){
-			var x=0;
-			var TDMA = GetTDMA();
-			GridSystem();
-		
-			//reset the grid
-			for(var u=1; u<=40*TDMA; u++){
-				document.getElementById(u).innerHTML = "";
-				document.getElementById(u).style.color = "black";
+
+
+	}
+
+	function init(){
+		for (var val = 0; val < document.getElementById("communication-input").value; val++){
+			// add number to row of numbers
+			caseNumber.push(val);
+			// generate occurence for each number
+			var occurence = Math.random() * 9 +1;
+			var GSM = true;
+			if (document.getElementById("Type-input").value == "1") {GSM = false;}
+			// if GSM, all occurences = 1
+			if (occurence < 7 || GSM){
+				numberOfOccurence[val] = 1;
 			}
-			
-			//get the number of communications
-			var inputCom = document.getElementById("communication-input");
-			if( inputCom.value > 40){ inputCom.value = 40;}
-			
-			//Initialization
-			var listPosition = [];
-			var pattern = [];
-			var nbFrame= [];
-			pattern.push(1);
-			
-			//define hopping pattern
-			for(var f=1; f<TDMA; f++){
-				do{
-					
-					var num = Math.floor(Math.random() * TDMA) + 1;
-				}while(pattern.indexOf(num)!=-1);
-				pattern.push(num);
+			else if (occurence < 9){
+				numberOfOccurence[val] = 2;
 			}
-
-		
-
-			var test=1;
-			var min,max;
-			//for each communication simulate hopping pattern
-			for(var k=1; k<=inputCom.value ; k++){
-				//Generate a random number between 1 and 40
-				if(x==0) min = 8*(test-1)+2;
-				else min = 8*(test-1)+1;
-				max=8*(test);
-
-				
-				do{
-						var position=Math.floor(Math.random() * (max - min + 1)) + min;
-				}while (listPosition.indexOf(position)!=-1);
-				
-				var row_taken=Math.ceil(position/8);
-				markers[row_taken]=1;
-				if(test==5){
-					test=0;
-				}
-				test++;
-
-				var trxID = x+1;
-				// x++;
-				var maioID = 'trx'+trxID;
-				// trx+trxID+"bool"=1;
-				var color=getFrequency(0, maioID);
-				listPosition.push(position);
-
-				//Display the communication number in the div with a random color
-				var divPos = document.getElementById(position);
-				// divPos.style.borderColor=color;
-				changeRowColor(position,color);
-				console.log(color);
-
-				divPos.innerHTML = k;
-				var randColor = '#'+Math.floor(Math.random()*16777215).toString(16);
-				divPos.style.color = "black";
-				
-				//Apply the design pattern for the current communication
-				for(l=1;l<TDMA;l++){
-					var idToChange = position + l*40;
-					while(idToChange>(l+1)*40){idToChange-=40;}
-					color=getFrequency(l, maioID);
-					document.getElementById(idToChange).innerHTML = k;
-					document.getElementById(idToChange).style.color = "black";
-					changeRowColor(idToChange,color);
-					
-				}
-				x++;
-				if(x==5){
-					x=0;
-				}
-
+			else{
+				numberOfOccurence[val] = 3;
 			}
-
-			for(i=1;i<200;i=i+40){
-				document.getElementById(i).style.backgroundColor = "#805a46";
-				
-			}
-			fillRemainingColor(markers);
+			commLength[val] =  Math.floor((Math.random() * GetTDMA() +1));
 		}
 
-		function changeRowColor(position,color){
-			var test=position/40;
-			// console.log(Math.ceil(test));
-		
-			var whichRow=Math.ceil(position/8);
-			console.log(Math.ceil(whichRow));
-
-			// if(position>=1*whichRow && position<=8*whichRow){
-				for(var x=1+(8*(whichRow-1));x<=8*whichRow;x++){
-					// console.log(x);
-				
-					var divPosTest = document.getElementById(x);
-					divPosTest.style.backgroundColor=color;	
-				}
-
+		// Initialize case array
+		for (var cacase=1;cacase<40;cacase++){
+			caseArray[cacase-1] = cacase;
 		}
 
-		function fillRemainingColor(markers){
-			console.log("HEloooooo");
-			var TDMA = GetTDMA();
-			for(i=1;i<markers.length;i++){
-				if(markers[i]==0){
-					var maioID = 'trx'+i;
-					var color=getFrequency(0, maioID);
-					var idToChange=8*i;
-					changeRowColor(idToChange,color);
+		// Initialize first Matrix
+		for (var x = 0 ; x < 40; x++){
+			matrix[x]=-1;
+		}
 
-					for(l=1;l<TDMA;l++){
-					idToChange = idToChange + l*40;
-					while(idToChange>(l+1)*40){idToChange-=40;}
-					color=getFrequency(l, maioID);
-					document.getElementById(idToChange).style.color = "black";
-					changeRowColor(idToChange,color);
-					
+		// Initialize all TDMA Tables
+		for(var y = 0; y<GetTDMA(); y++){
+			matrixOfMatrix[y] = [];
+			for (var z = 0; z<40; z++){
+				matrixOfMatrix[y][z] = 0;
+			}
+		}
+
+
+		// Place communications in the first Matrix
+		for(var number in caseNumber){
+			var placed = 0;
+			var index = Math.floor(Math.random() * caseArray.length);
+			var occurence = numberOfOccurence[number];
+			// Place communication in the first empty slot randomly chosen
+			if(occurence == 1){
+				cacase = caseArray[index];
+				matrix[cacase] = number;
+				caseArray.splice(caseArray.indexOf(cacase),1);
+				placed++;
+			}
+			// Reserve next communications if occurences < 1
+			else if( occurence == 2){
+				cacase = caseArray[index];
+				matrix[cacase] = number;
+				placed ++;
+				// Check next case
+				if(caseArray[index-1] == caseArray[index] -1 && (caseArray[index-1] % 8) +1 == caseArray[index] % 8){
+					matrix[caseArray[index-1]] = number;
+					placed ++;
+					caseArray.splice(caseArray.indexOf(cacase),1);
+					caseArray.splice(caseArray.indexOf(cacase-1),1);
 				}
-
+				// Check prev. case
+				else if(caseArray[index+1] == caseArray[index] + 1 && (caseArray[index+1] % 8) -1 == caseArray[index] % 8){
+					matrix[caseArray[cacase+1]] = number;
+					placed ++;
+					caseArray.splice(caseArray.indexOf(cacase+1),1);
+					caseArray.splice(caseArray.indexOf(cacase),1);
+				}else{
+					caseArray.splice(caseArray.indexOf(cacase),1);
+				}
+			}else if( occurence == 3){
+				cacase = caseArray[index];
+				matrix[cacase] = number;
+				placed ++;
+				// Check next case
+				if(caseArray[index-1] == caseArray[index] - 1 && (caseArray[index-1] % 8) + 1 == caseArray[index] % 8 ){
+					placed ++;
+					matrix[cacase-1] = number;
+					// Check next case
+					if(placed == 2 && caseArray[index-2] == caseArray[index-1] -1 && (caseArray[index-2] % 8) + 1 == caseArray[index-1] % 8){
+						placed ++;
+						caseArray.splice(caseArray.indexOf(cacase),1);
+						caseArray.splice(caseArray.indexOf(cacase-1),1);
+						caseArray.splice(caseArray.indexOf(cacase-2),1);
+						matrix[cacase-2] = number;
+					}
+				}
+				// Check prev. case
+				if(placed < 3 && caseArray[index+1] == caseArray[index] + 1 && (caseArray[index+1] % 8 ) -1 == caseArray[index] % 8 ){
+					placed ++;
+					matrix[cacase+1] = number;
+					// Check prev. case
+					if(placed < 3 && caseArray[index+2] == caseArray[index+1] + 1 && (caseArray[index+2] % 8) -1 == caseArray[index+1] % 8){
+						placed ++;
+						caseArray.splice(caseArray.indexOf(cacase+2),1);
+						caseArray.splice(caseArray.indexOf(cacase+1),1);
+						caseArray.splice(caseArray.indexOf(cacase),1);
+						caseArray[cacase+2] = number;
+					}else{
+						caseArray.splice(caseArray.indexOf(cacase + 1),1);
+						caseArray.splice(caseArray.indexOf(cacase),1);
+						if(placed == 3){
+							caseArray.splice(caseArray.indexOf(index -1),1);
+						}
+					}
+				}else{
+					caseArray.splice(caseArray.indexOf(cacase),1);
+					if(placed == 2){
+						caseArray.splice(caseArray.indexOf(cacase-1),1);
+					}
 				}
 			}
-
+			// If all the time slot has not been reserved, increase of CommLength
+			if(placed != occurence){
+				commLength[number] = Math.floor(commLength[number] + commLength[number] * (occurence - placed) / occurence);
+			}
 		}
-	</script>
+
+		// Each TDMA frame Commlength is diminuted by one
+		for(var boucle = 0; boucle<GetTDMA(); boucle ++){
+			// Generation of next frame
+			for(var x=0; x<matrix.length;x++){
+				if(matrix[x] == -1 || commLength[matrix[x]] <= 0){
+					matrixOfMatrix[boucle][x] = -1;
+				}else{
+					matrixOfMatrix[boucle][x] = matrix[x];
+				}
+			}
+			// Decreasing
+			for(var i = 0; i<commLength.length; i++){
+				commLength[i] -= 1;
+			}
+		}
+	}
+
+</script>
 </html>
