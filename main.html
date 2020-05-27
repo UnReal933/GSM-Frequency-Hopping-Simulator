@@ -51,7 +51,7 @@
 		<label for="communication-input">Number of communications : </label>
 		<input id="communication-input" type="number" min="1" max="39" value="1">
 	</div>
-	<button id="submit-btn" class="btn btn-primary mt-2" onclick="Simulation()">Simulate</button>
+	<button id="submit-btn" class="btn btn-primary mt-2 mb-5" onclick="Simulation()">Simulate</button>
 </div>
 </body>
 <script>
@@ -131,7 +131,7 @@
 				}else{
 				// Set the comm. value
 				if(matrixOfMatrix[Math.floor((i-1)/40)][(i-1)%40] != -1)
-					document.getElementById(i).innerHTML = matrixOfMatrix[Math.floor((i-1)/40)][(i-1)%40];
+					document.getElementById(i).innerHTML = parseInt(matrixOfMatrix[Math.floor((i-1)/40)][(i-1)%40])+1;
 			}
 			// Colorize cases based on it place
 			var divPosTest = document.getElementById(i);
@@ -164,10 +164,10 @@
 			var GSM = true;
 			if (document.getElementById("Type-input").value == "1") {GSM = false;}
 			// if GSM, all occurences = 1
-			if (occurence < 7 || GSM){
+			if (occurence < 6 || GSM){
 				numberOfOccurence[val] = 1;
 			}
-			else if (occurence < 9){
+			else if (occurence < 8){
 				numberOfOccurence[val] = 2;
 			}
 			else{
