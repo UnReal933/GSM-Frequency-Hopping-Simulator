@@ -25,7 +25,7 @@
 
 <body onload="GridSystem()">
 <h4 class="text-center mt-4">Frequency Hopping Simulator</h4>
-<p class="text-center mb-4" style="font-size: 12px; ">by : GARCENOT Thoms, PERRIN Ewan, GROTTO Clément, GAUTAM Ishan, SHAKYA Joshua</p>
+<p class="text-center mb-4" style="font-size: 12px; ">by GARCENOT Thomas, PERRIN Ewan, GROTTO Clément, GAUTAM Ishan, SHAKYA Joshua</p>
 <div class="row mx-auto" id="master-row">
 </div>
 <div class="text-center mt-5">
@@ -65,6 +65,7 @@
 	var commLength = [];
 	var colorPattern = ['Green', 'Magenta', 'Cyan', 'Red', 'Orange'];
 	var newColorPattern = [];
+	
 	const MAIO = [0,3,4,2,1]
 
 
@@ -87,12 +88,13 @@
 
 			//Add title to every column
 			var title = document.createElement("h5");
-			title.innerHTML = "T = " + (j-1)
+			title.innerHTML = "T = " + (j-1);
+			title.style.textAlign = "center";
 			document.getElementById("col-"+j).appendChild(title);
 
 			//Add grid system in every column
 			var grid = document.createElement("div");
-			grid.className = "grid-container mt-2";
+			grid.className = "grid-container mt-2 justify-content-center";
 			grid.id = "grid-" + j;
 			document.getElementById("col-"+j).appendChild(grid);
 
@@ -100,6 +102,7 @@
 			for(var i=(1+(40*(j-1)));i<=(40+(40*(j-1)));i++){
 				var div = document.createElement("div");
 				div.id = i;
+				div.style.fontWeight = "bold";
 				document.getElementById("grid-"+j).appendChild(div);
 			}
 		}
@@ -113,6 +116,8 @@
 		caseNumber = []; // List of comm.
 		numberOfOccurence = [];
 		commLength = [];
+		var colorPattern = ['Green', 'Magenta', 'Cyan', 'Red', 'Orange'];
+		var newColorPattern = [];
 
 		GridSystem();
 		init();
