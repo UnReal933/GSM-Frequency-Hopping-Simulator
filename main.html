@@ -72,7 +72,11 @@
 
 	//Get the number of TDMA frame
 	function GetTDMA(){
-		return document.getElementById("TDMA-input").value;
+		var valTDMA = document.getElementById("TDMA-input").value
+		if (valTDMA > 100) {valTDMA=100;}
+		if (valTDMA < 2) {valTDMA=2;}
+		return valTDMA;
+
 	}
 
 	//Set up the view
@@ -161,7 +165,13 @@
 	}
 
 	function init(){
-		for (var val = 0; val < document.getElementById("communication-input").value; val++){
+
+		valComm = document.getElementById("communication-input").value;
+		
+		if(valComm < 1){valComm = 1;}
+		if(valComm > 39){valComm = 39;}
+
+		for (var val = 0; val < valComm; val++){
 			// add number to row of numbers
 			caseNumber.push(val);
 			// generate occurence for each number
