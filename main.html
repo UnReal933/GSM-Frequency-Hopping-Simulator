@@ -223,18 +223,15 @@
 			// add number to row of numbers
 			caseNumber.push(val);
 			// generate occurence for each number
-			var occurence = Math.random() * 9 +1;
+			var occurence = Math.random() * 31 +1;
 			var GSM = true;
 			if (document.getElementById("Type-input").value == "1") {GSM = false;}
 			// if GSM, all occurences = 1
-			if (occurence < 6 || GSM){
+			if (GSM || Math.floor(occurence) % 6 ===0){
 				numberOfOccurence[val] = 1;
 			}
-			else if (occurence < 8){
-				numberOfOccurence[val] = 2;
-			}
-			else{
-				numberOfOccurence[val] = 8;
+			else {
+				numberOfOccurence[val] = Math.floor(occurence / 4);
 			}
 			commLength[val] =  Math.floor((Math.random() * GetTDMA() +3));
 		}
