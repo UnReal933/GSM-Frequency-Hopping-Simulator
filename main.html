@@ -28,7 +28,12 @@
 <p class="text-center mb-4" style="font-size: 12px; ">by GARCENOT Thomas, PERRIN Ewan, GROTTO Clément, GAUTAM Ishan, SHAKYA Joshua</p>
 <div class="row mx-auto" id="master-row">
 </div>
-<div class="text-center mt-5">
+<div class="row mx-auto mt-3 mb-1 justify-content-center" id="row-btn" style="display:none">
+	<button id="prev-btn" class="btn btn-primary mx-4 mt-2" style="width:120px;" onclick="Prev()">< Previous</button>
+	<button id="all-btn" class="btn btn-primary mx-4 mt-2" style="width:120px;" onclick="DisplayAll()">Display all</button>
+	<button id="next-btn" class="btn btn-primary mx-4 mt-2" style="width:120px;" onclick="Next()">Next ></button>
+</div>
+<div class="text-center mt-3">
 	<div id="frequencies" style="display: none;">
 		<p id="f-1" style="display: inline-block; margin: 20px; font-weight: bold;"> frequency 1 </p>
 		<p id="f-2" style="display: inline-block; margin: 20px; font-weight: bold;"> frequency 2 </p>
@@ -51,7 +56,7 @@
 		<label for="communication-input">Number of communications : </label>
 		<input id="communication-input" type="number" min="1" max="39" value="1">
 	</div>
-	<button id="submit-btn" class="btn btn-primary mt-2 mb-5" onclick="Simulation()">Simulate</button>
+	<button id="submit-btn" class="btn btn-primary mt-2 mb-5" style="width:120px;" onclick="Simulation()">Simulate</button>
 </div>
 </body>
 <script>
@@ -65,7 +70,7 @@
 	var commLength = [];
 	var colorPattern = ['Green', 'Magenta', 'Cyan', 'Red', 'Orange'];
 	var newColorPattern = [];
-	
+	var divIndex = 1;
 	const MAIO = [0,3,4,2,1]
 
 
@@ -88,6 +93,7 @@
 			var col = document.createElement("div");
 			col.className = "col-6 col-md-4 col-lg-3 col-xl-2 mx-auto mt-2";
 			col.id = "col-" + j;
+			if(j>1){col.style.display = "none";}
 			document.getElementById("master-row").appendChild(col);
 
 			//Add title to every column
@@ -112,6 +118,42 @@
 		}
 	}
 
+	function Prev(){
+		if(divIndex>1){
+			document.getElementById("col-" + divIndex).style.display = "none";
+			document.getElementById("col-" + (divIndex-1)).style.display = "inline-block";
+			divIndex--;
+		}
+	}
+
+	function DisplayAll(){
+		if(document.getElementById("all-btn").innerHTML=="Display all"){
+			for(var index=1;index<=GetTDMA();index++){
+				document.getElementById("col-" + index).style.display = "inline-block";
+			}
+			document.getElementById("all-btn").innerHTML="Display less";
+			document.getElementById("prev-btn").style.display = "none";
+			document.getElementById("next-btn").style.display = "none";
+			divIndex=1;
+		}
+		else{
+			document.getElementById("prev-btn").style.display = "inline-block";
+			document.getElementById("next-btn").style.display = "inline-block";
+			document.getElementById("all-btn").innerHTML="Display all";
+			for(var index=2;index<=GetTDMA();index++){
+				document.getElementById("col-" + index).style.display = "none";
+			}
+		}
+	}
+
+	function Next(){
+		if(GetTDMA()>divIndex){
+			document.getElementById("col-" + divIndex).style.display = "none";
+			document.getElementById("col-" + (divIndex+1)).style.display = "inline-block";
+			divIndex++;
+		}
+	}
+
 	// Run the simulation
 	function Simulation(){
 		matrix = [] //Tdma Frame
@@ -122,6 +164,10 @@
 		commLength = [];
 		var colorPattern = ['Green', 'Magenta', 'Cyan', 'Red', 'Orange'];
 		var newColorPattern = [];
+		divIndex=1;
+		document.getElementById("prev-btn").style.display = "inline-block";
+		document.getElementById("next-btn").style.display = "inline-block";
+		document.getElementById("all-btn").innerHTML="Display all";
 
 		GridSystem();
 		init();
@@ -158,6 +204,8 @@
 			if((i-1)%40 == 0){
 				document.getElementById(i).style.backgroundColor = "#805a46";
 			}
+
+			document.getElementById("row-btn").style.display = "flex";
 		}
 
 
