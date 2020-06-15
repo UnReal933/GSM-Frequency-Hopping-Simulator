@@ -223,7 +223,7 @@
 			// add number to row of numbers
 			caseNumber.push(val);
 			// generate occurence for each number
-			var occurence = Math.random() * 31 +1;
+			var occurence = Math.random() * 25 +1;
 			var GSM = true;
 			if (document.getElementById("Type-input").value == "1") {GSM = false;}
 			// if GSM, all occurences = 1
@@ -231,7 +231,7 @@
 				numberOfOccurence[val] = 1;
 			}
 			else {
-				numberOfOccurence[val] = Math.floor(occurence / 4);
+				numberOfOccurence[val] = Math.floor(occurence / 3);
 			}
 			commLength[val] =  Math.floor((Math.random() * GetTDMA() +3));
 		}
@@ -260,14 +260,6 @@
 			var placed = 0;
 			var index = Math.floor(Math.random() * caseArray.length);
 			var occurence = numberOfOccurence[number];
-			// Place communication in the first empty slot randomly chosen
-			// if(occurence == 1){
-			// 	caseIndex = caseArray[index];
-			// 	matrix[caseIndex] = number;
-			// 	caseArray.splice(caseArray.indexOf(caseIndex),1);
-			// 	placed++;
-			// }
-			//
 			tempOccurence = occurence
 			tempIndex = index
 			while (tempOccurence > 0 ) {
@@ -286,72 +278,9 @@
 					matrix[caseIndex] = number;
 					caseArray.splice(caseArray.indexOf(caseIndex),1);
 			}
-			//
-			//
-			// // Reserve next communications if occurences < 1
-			// else if( occurence == 2){
-			// 	caseIndex = caseArray[index];
-			// 	matrix[caseIndex] = number;
-			// 	placed ++;
-			// 	// Check next case
-			// 	if(caseArray[index-1] == caseArray[index] -1 && (caseArray[index-1] % 8) +1 == caseArray[index] % 8){
-			// 		matrix[caseArray[index-1]] = number;
-			// 		placed ++;
-			// 		caseArray.splice(caseArray.indexOf(caseIndex),1);
-			// 		caseArray.splice(caseArray.indexOf(caseIndex-1),1);
-			// 	}
-			// 	// Check prev. case
-			// 	else if(caseArray[index+1] == caseArray[index] + 1 && (caseArray[index+1] % 8) -1 == caseArray[index] % 8){
-			// 		matrix[caseArray[caseIndex+1]] = number;
-			// 		placed ++;
-			// 		caseArray.splice(caseArray.indexOf(caseIndex+1),1);
-			// 		caseArray.splice(caseArray.indexOf(caseIndex),1);
-			// 	}else{
-			// 		caseArray.splice(caseArray.indexOf(caseIndex),1);
-			// 	}
-			// }else if( occurence == 3){
-			// 	caseIndex = caseArray[index];
-			// 	matrix[caseIndex] = number;
-			// 	placed ++;
-			// 	// Check next case
-			// 	if(caseArray[index-1] == caseArray[index] - 1 && (caseArray[index-1] % 8) + 1 == caseArray[index] % 8 ){
-			// 		placed ++;
-			// 		matrix[caseIndex-1] = number;
-			// 		// Check next case
-			// 		if(placed == 2 && caseArray[index-2] == caseArray[index-1] -1 && (caseArray[index-2] % 8) + 1 == caseArray[index-1] % 8){
-			// 			placed ++;
-			// 			caseArray.splice(caseArray.indexOf(caseIndex),1);
-			// 			caseArray.splice(caseArray.indexOf(caseIndex-1),1);
-			// 			caseArray.splice(caseArray.indexOf(caseIndex-2),1);
-			// 			matrix[caseIndex-2] = number;
-			// 		}
-			// 	}
-			// 	// Check prev. case
-			// 	if(placed < 3 && caseArray[index+1] == caseArray[index] + 1 && (caseArray[index+1] % 8 ) -1 == caseArray[index] % 8 ){
-			// 		placed ++;
-			// 		matrix[caseIndex+1] = number;
-			// 		// Check prev. case
-			// 		if(placed < 3 && caseArray[index+2] == caseArray[index+1] + 1 && (caseArray[index+2] % 8) -1 == caseArray[index+1] % 8){
-			// 			placed ++;
-			// 			caseArray.splice(caseArray.indexOf(caseIndex+2),1);
-			// 			caseArray.splice(caseArray.indexOf(caseIndex+1),1);
-			// 			caseArray.splice(caseArray.indexOf(caseIndex),1);
-			// 			caseArray[caseIndex+2] = number;
-			// 		}else{
-			// 			caseArray.splice(caseArray.indexOf(caseIndex + 1),1);
-			// 			caseArray.splice(caseArray.indexOf(caseIndex),1);
-			// 			if(placed == 3){
-			// 				caseArray.splice(caseArray.indexOf(index -1),1);
-			// 			}
-			// 		}
-			// 	}else{
-			// 		caseArray.splice(caseArray.indexOf(caseIndex),1);
-			// 		if(placed == 2){
-			// 			caseArray.splice(caseArray.indexOf(caseIndex-1),1);
-			// 		}
-			// 	}
-			// }
+
 			// If all the time slot has not been reserved, increase of CommLength
+			placed = tempIndex - index
 			if(placed != occurence){
 				commLength[number] = Math.floor(commLength[number] + commLength[number] * (occurence - placed) / occurence);
 			}
